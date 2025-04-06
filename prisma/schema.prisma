@@ -14,18 +14,6 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-model Post {
-    id        Int      @id @default(autoincrement())
-    name      String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-
-    createdBy   User   @relation(fields: [createdById], references: [id])
-    createdById String
-
-    @@index([name])
-}
-
 // Necessary for Next auth
 model Account {
     id                       String  @id @default(cuid())
@@ -54,21 +42,104 @@ model Session {
     user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model User {
-    id            String    @id @default(cuid())
-    name          String?
-    email         String?   @unique
-    emailVerified DateTime?
-    image         String?
-    accounts      Account[]
-    sessions      Session[]
-    posts         Post[]
-}
-
 model VerificationToken {
     identifier String
     token      String   @unique
     expires    DateTime
 
     @@unique([identifier, token])
+}
+
+// schema.prisma
+
+model User {
+    id            String    @id @default(cuid())
+    email         String    @unique
+    emailVerified DateTime?
+    image         String?
+    accounts      Account[]
+    sessions      Session[]
+    createdAt     DateTime  @default(now())
+    updatedAt     DateTime  @updatedAt
+
+    seekerProfile   SeekerProfile?
+    employerProfile EmployerProfile?
+
+    jobs         Job[]         @relation("EmployerJobs")
+    applications Application[]
+
+    role Role?
+}
+
+model SeekerProfile {
+    id         String   @id @default(cuid())
+    userId     String   @unique
+    name       String
+    surname    String
+    fathername String
+    gender     String
+    birthday   DateTime
+    contact    String
+
+    education         String
+    resume            String
+    wish_job          String
+    experienceLevelId String?
+    experienceLevel   ExperienceLevel? @relation(fields: [experienceLevelId], references: [id])
+    user              User             @relation(fields: [userId], references: [id])
+}
+
+model EmployerProfile {
+    id          String  @id @default(cuid())
+    userId      String  @unique
+    companyName String
+    description String?
+    contact     String
+    user        User    @relation(fields: [userId], references: [id])
+}
+
+model Job {
+    id                String          @id @default(cuid())
+    title             String
+    description       String
+    location          String
+    experienceLevel   ExperienceLevel @relation(fields: [experienceLevelId], references: [id])
+    experienceLevelId String
+    category          Category        @relation(fields: [categoryId], references: [id])
+    categoryId        String
+    createdAt         DateTime        @default(now())
+    updatedAt         DateTime        @updatedAt
+
+    employer   User   @relation("EmployerJobs", fields: [employerId], references: [id])
+    employerId String
+
+    applications Application[]
+}
+
+model Application {
+    id        String   @id @default(cuid())
+    jobId     String
+    userId    String
+    createdAt DateTime @default(now())
+
+    job  Job  @relation(fields: [jobId], references: [id])
+    user User @relation(fields: [userId], references: [id])
+}
+
+model Category {
+    id   String @id @default(cuid())
+    name String @unique
+    jobs Job[]
+}
+
+model ExperienceLevel {
+    id            String          @id @default(cuid())
+    name          String          @unique
+    jobs          Job[]
+    SeekerProfile SeekerProfile[]
+}
+
+enum Role {
+    SEEKER
+    EMPLOYER
 }

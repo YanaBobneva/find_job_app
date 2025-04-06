@@ -1,0 +1,33 @@
+services:
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: findjob_pass
+      POSTGRES_USER: findjob_user
+    ports:
+      - 5433:5432
+    volumes:
+      - findjob_postgres:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@findjob.com
+      PGADMIN_DEFAULT_PASSWORD: findjobadmin
+      PGADMIN_LISTEN_PORT: 80
+    ports:
+      - 15433:80
+    volumes:
+      - findjob_pgadmin:/var/lib/pgadmin
+    depends_on:
+      - postgres
+
+  mailcatcher:
+    image: schickling/mailcatcher
+    ports:
+      - 1081:1080
+      - 1026:1025
+
+volumes:
+  findjob_postgres:
+  findjob_pgadmin:
