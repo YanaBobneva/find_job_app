@@ -72,21 +72,23 @@ model User {
 }
 
 model SeekerProfile {
-    id         String   @id @default(cuid())
-    userId     String   @unique
-    name       String
-    surname    String
-    fathername String
-    gender     String
-    birthday   DateTime
-    contact    String
+    id          String   @id @default(cuid())
+    userId      String   @unique
+    name        String
+    surname     String
+    fathername  String
+    gender      String
+    birthday    DateTime
+    phoneNumber Int
+    email       String
 
-    education         String
-    resume            String
-    wish_job          String
-    experienceLevelId String?
-    experienceLevel   ExperienceLevel? @relation(fields: [experienceLevelId], references: [id])
-    user              User             @relation(fields: [userId], references: [id])
+    education       String
+    resume          String
+    wish_job        String
+    // experienceLevelId String?
+    // experienceLevel   ExperienceLevel? @relation(fields: [experienceLevelId], references: [id])
+    experienceLevel String
+    user            User   @relation(fields: [userId], references: [id])
 }
 
 model EmployerProfile {
@@ -94,21 +96,25 @@ model EmployerProfile {
     userId      String  @unique
     companyName String
     description String?
-    contact     String
+    phoneNumber String
+    email       String?
+    website     String?
     user        User    @relation(fields: [userId], references: [id])
 }
 
 model Job {
-    id                String          @id @default(cuid())
-    title             String
-    description       String
-    location          String
-    experienceLevel   ExperienceLevel @relation(fields: [experienceLevelId], references: [id])
-    experienceLevelId String
-    category          Category        @relation(fields: [categoryId], references: [id])
-    categoryId        String
-    createdAt         DateTime        @default(now())
-    updatedAt         DateTime        @updatedAt
+    id              String   @id @default(cuid())
+    title           String
+    description     String
+    location        String
+    salary          Int
+    // experienceLevel   ExperienceLevel @relation(fields: [experienceLevelId], references: [id])
+    // experienceLevelId String
+    experienceLevel String
+    // category          Category        @relation(fields: [categoryId], references: [id])
+    // categoryId        String
+    createdAt       DateTime @default(now())
+    updatedAt       DateTime @updatedAt
 
     employer   User   @relation("EmployerJobs", fields: [employerId], references: [id])
     employerId String
@@ -126,20 +132,21 @@ model Application {
     user User @relation(fields: [userId], references: [id])
 }
 
-model Category {
-    id   String @id @default(cuid())
-    name String @unique
-    jobs Job[]
-}
+// model Category {
+//     id   String @id @default(cuid())
+//     name String @unique
+//     jobs Job[]
+// }
 
-model ExperienceLevel {
-    id            String          @id @default(cuid())
-    name          String          @unique
-    jobs          Job[]
-    SeekerProfile SeekerProfile[]
-}
+// model ExperienceLevel {
+//     id            String          @id @default(cuid())
+//     name          String          @unique
+//     jobs          Job[]
+//     SeekerProfile SeekerProfile[]
+// }
 
 enum Role {
     SEEKER
     EMPLOYER
+    ADMIN
 }

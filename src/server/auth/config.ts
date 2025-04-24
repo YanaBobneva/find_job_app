@@ -18,7 +18,7 @@ declare module "next-auth" {
     user: {
       id: string;
       // ...other properties
-      // role: UserRole;
+      role: $Enums.Role | null;
     } & DefaultSession["user"];
   }
 
@@ -51,4 +51,10 @@ export const authConfig = {
       },
     }),
   },
+  // pages: {
+  //   signIn: "/auth/signin",      // Страница входа
+  //   error: "/auth/error",        // Страница ошибки
+  //   verifyRequest: "/auth/verify-request", // Страница подтверждения email
+  //   newUser: "/choose-role",   // Страница, куда будет перенаправлен пользователь после успешной авторизации
+  // },
 } satisfies NextAuthConfig;
