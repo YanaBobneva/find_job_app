@@ -5,4 +5,3 @@ export const experienceLevels = [
     { id: "От 3 до 6 лет", name: "От 3 до 6 лет" },
     { id: "Более 6 лет", name: "Более 6 лет" },
   ];
-  

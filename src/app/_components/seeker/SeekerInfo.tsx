@@ -2,9 +2,51 @@
 
 import { useState } from "react";
 import { EditSeekerProfileModal } from "../../_components/seeker/EditSeekerProfileModal";
+import { useFavoriteResume } from "~/hooks/useFavoriteResume";
 
-export default function SeekerInfo({ profile }: { profile: any }) {
+export default function SeekerInfo({
+  seeker,
+  mode,
+}: {
+  seeker: any;
+  mode: boolean;
+}) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { isFavorite, handleAdd, handleDelete } = seeker
+    ? useFavoriteResume(seeker.id)
+    : { isFavorite: false, handleAdd: () => {}, handleDelete: () => {} };
+
+  const seekerInfoToPass = seeker
+    ? {
+        name: seeker.name,
+        surname: seeker.surname,
+        fathername: seeker.fathername,
+        gender: seeker.gender,
+        birthday: seeker.birthday,
+        phoneNumber: seeker.phoneNumber,
+        email: seeker.email,
+        education: seeker.education,
+        resume: seeker.resume,
+        wish_job: seeker.wish_job,
+        experienceLevel: seeker.experienceLevel,
+        location: seeker.location,
+      }
+    : {
+        name: "",
+        surname: "",
+        fathername: "",
+        gender: "",
+        birthday: "",
+        phoneNumber: "",
+        email: "",
+        education: "",
+        resume: "",
+        wish_job: "",
+        experienceLevel: "",
+        location: "",
+      };
+
+  const seekerExists = seeker !== undefined && seeker !== null;
 
   return (
     <div className="mx-auto max-w-4xl p-6">
@@ -13,54 +55,71 @@ export default function SeekerInfo({ profile }: { profile: any }) {
           <h1 className="text-3xl font-bold text-cyan-800">
             Профиль соискателя
           </h1>
-          <button
-            className="btn btn-outline btn-sm border-cyan-500 text-cyan-700 hover:bg-cyan-500 hover:text-white"
-            onClick={() => setIsModalOpen(true)}
-          >
-            Редактировать профиль
-          </button>
+          {mode ? (
+            <button
+              className="btn btn-outline btn-sm border-cyan-500 text-cyan-700 hover:bg-cyan-500 hover:text-white"
+              onClick={() => setIsModalOpen(true)}
+            >
+              Редактировать профиль
+            </button>
+          ) : (
+            <button
+              className="btn btn-outline btn-sm border-red-500 text-red-700 hover:bg-red-500 hover:text-white"
+              onClick={isFavorite ? handleDelete : handleAdd}
+            >
+              {isFavorite ? "Удалить из избранного" : "Добавить в избранное"}
+            </button>
+          )}
         </div>
         <div className="grid grid-cols-1 gap-4 text-cyan-900 sm:grid-cols-2">
           <div>
-            <span className="font-semibold">ФИО:</span> {profile.surname}{" "}
-            {profile.name} {profile.fathername}
+            <span className="font-semibold">ФИО:</span>{" "}
+            {seekerInfoToPass.surname} {seekerInfoToPass.name}{" "}
+            {seekerInfoToPass.fathername}
           </div>
           <div>
-            <span className="font-semibold">Пол:</span> {profile.gender}
+            <span className="font-semibold">Пол:</span>{" "}
+            {seekerInfoToPass.gender}
           </div>
           <div>
             <span className="font-semibold">Дата рождения:</span>{" "}
-            {new Date(profile.birthday).toLocaleDateString()}
+            {seekerInfoToPass.birthday
+              ? new Date(seekerInfoToPass.birthday).toISOString().slice(0, 10)
+              : ""}
           </div>
           <div>
-            <span className="font-semibold">Телефон:</span> +
-            {profile.phoneNumber}
+            <span className="font-semibold">Телефон:</span>{" "}
+            {seekerInfoToPass.phoneNumber}
           </div>
           <div>
             <span className="font-semibold">Email:</span>{" "}
             <a
               className="text-cyan-600 hover:underline"
-              href={`mailto:${profile.email}`}
+              href={`mailto:${seekerInfoToPass.email}`}
             >
-              {profile.email}
+              {seekerInfoToPass.email}
             </a>
           </div>
           <div>
             <span className="font-semibold">Желаемая должность:</span>{" "}
-            {profile.wish_job}
+            {seekerInfoToPass.wish_job}
           </div>
           <div>
             <span className="font-semibold">Опыт:</span>{" "}
-            {profile.experienceLevel}
+            {seekerInfoToPass.experienceLevel}
+          </div>
+          <div>
+            <span className="font-semibold">Город:</span>{" "}
+            {seekerInfoToPass.location}
           </div>
           <div className="sm:col-span-2">
             <span className="font-semibold">Образование:</span>{" "}
-            {profile.education}
+            {seekerInfoToPass.education}
           </div>
           <div className="sm:col-span-2">
             <span className="font-semibold">Резюме:</span>
             <div className="mt-1 rounded-md border border-gray-200 bg-gray-50 p-3 whitespace-pre-wrap">
-              {profile.resume}
+              {seekerInfoToPass.resume}
             </div>
           </div>
         </div>
@@ -68,7 +127,8 @@ export default function SeekerInfo({ profile }: { profile: any }) {
       <EditSeekerProfileModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        profile={profile}
+        seekerInfo={seekerInfoToPass}
+        isExistingSeeker={seekerExists}
       />
     </div>
   );

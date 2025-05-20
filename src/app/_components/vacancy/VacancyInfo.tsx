@@ -4,9 +4,10 @@ import { Pencil, Trash2, UserPlus } from "lucide-react";
 import Link from "next/link";
 import { EditVacancyModal } from "./EditVacancyModal";
 import { useState } from "react";
-import type { $Enums } from "@prisma/client";
 import { api } from "~/trpc/react";
 import { useRouter } from "next/navigation";
+import { useFavoriteVacancy } from "~/hooks/useFavoriteVacancy";
+import { useSendApplication } from "~/hooks/useSendApplication";
 
 export function VacancyInfo({
   vacancy,
@@ -18,9 +19,13 @@ export function VacancyInfo({
   employerId: string | undefined;
 }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { isFavorite, handleAdd, handleDelete } = useFavoriteVacancy(
+    vacancy.id,
+  );
+  const { sendApplication } = useSendApplication();
   const deleteMutation = api.vacancy.deleteVacancy.useMutation();
   const router = useRouter();
-  const handleDelete = async (e: React.FormEvent) => {
+  const handleDeleteVacancy = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
@@ -30,33 +35,51 @@ export function VacancyInfo({
       console.error("Ошибка при удалении вакансии:", error);
     }
   };
+
   return (
     <div>
       <div className="rounded-box relative bg-gradient-to-br from-cyan-100 to-cyan-200 p-6 shadow-lg">
-        {role === "EMPLOYER" ? (
-          <div className="absolute top-4 right-4 flex space-x-4">
-            <button
-              className="text-cyan-800 hover:text-cyan-600"
-              onClick={() => setIsModalOpen(true)}
-            >
-              <Pencil className="h-6 w-6" />
-            </button>
-            <button
-              className="text-red-600 hover:text-red-500"
-              onClick={handleDelete}
-            >
-              <Trash2 className="h-6 w-6" />
-            </button>
-          </div>
-        ) : (
-          <button className="btn bg-white text-cyan-800 shadow-md hover:bg-cyan-600">
-            <UserPlus className="mr-2 h-5 w-5" />
-            Откликнуться
-          </button>
-        )}
-        <h1 className="mb-2 text-3xl font-bold text-cyan-800">
-          {vacancy.title}
-        </h1>
+        <div className="mb-4 flex items-start justify-between">
+          <h1 className="text-3xl font-bold text-cyan-800">{vacancy.title}</h1>
+
+          {role === "EMPLOYER" ? (
+            <div className="flex space-x-4">
+              <button
+                className="text-cyan-800 hover:text-cyan-600"
+                onClick={() => setIsModalOpen(true)}
+              >
+                <Pencil className="h-6 w-6" />
+              </button>
+              <button
+                className="text-red-600 hover:text-red-500"
+                onClick={handleDeleteVacancy}
+              >
+                <Trash2 className="h-6 w-6" />
+              </button>
+            </div>
+          ) : (
+            <div className="flex space-x-4">
+              <button
+                className="btn flex space-x-2 bg-white text-cyan-800 shadow-md hover:bg-cyan-600"
+                onClick={() =>
+                  sendApplication(
+                    vacancy.employer.employerProfile.email,
+                    vacancy.id,
+                  )
+                }
+              >
+                <UserPlus className="h-5 w-5" />
+                <span>Откликнуться</span>
+              </button>
+              <button
+                className="btn btn-outline border-red-500 text-red-700 hover:bg-red-500 hover:text-white"
+                onClick={isFavorite ? handleDelete : handleAdd}
+              >
+                {isFavorite ? "Удалить из избранного" : "Добавить в избранное"}
+              </button>
+            </div>
+          )}
+        </div>
         <p className="mb-2 text-cyan-900">Местоположение: {vacancy.location}</p>
         <p className="mb-2 text-cyan-900">
           Опыт работы: {vacancy.experienceLevel}
@@ -72,30 +95,29 @@ export function VacancyInfo({
         </h2>
         <p className="mt-4 text-cyan-900">{vacancy.description}</p>
       </div>
-      <div className="rounded-box mt-6 flex flex-col items-center justify-between gap-4 bg-white p-6 shadow-lg sm:flex-row">
-        <div>
-          <h2 className="mb-1 text-lg font-semibold text-cyan-800">
-            Работодатель
-          </h2>
-          <Link
-            href={`/employer/${vacancy.employer.id}`}
-            className="text-cyan-600 hover:underline"
-          >
-            {vacancy.employer.name}
-          </Link>{" "}
-          |{" "}
-          <Link
-            href={`mailto:${vacancy.employer.email}`}
-            className="text-cyan-600 hover:underline"
-          >
-            {vacancy.employer.email}
-          </Link>{" "}
-          |{" "}
-          <span className="text-cyan-600 hover:underline">
-            +{vacancy.employer.phoneNumber}
-          </span>
+      {role === "SEEKER" && (
+        <div className="rounded-box mt-6 flex flex-col items-center justify-between gap-4 bg-white p-6 shadow-lg sm:flex-row">
+          <div className="text-cyan-800">
+            <h2 className="mb-1 text-lg font-semibold text-cyan-800">
+              Работодатель:{" "}
+              <Link
+                href={`/employer/${vacancy.employer.employerProfile.id}`}
+                className="text-cyan-600 hover:underline"
+              >
+                {vacancy.employer.employerProfile.companyName}
+              </Link>
+            </h2>
+            Контакты:{" "}
+            <Link
+              href={`mailto:${vacancy.employer.employerProfile.email}`}
+              className="text-cyan-600 hover:underline"
+            >
+              {vacancy.employer.employerProfile.email}
+            </Link>{" "}
+            | {vacancy.employer.employerProfile.phoneNumber}
+          </div>
         </div>
-      </div>
+      )}
       <EditVacancyModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

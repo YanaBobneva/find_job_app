@@ -1,6 +1,11 @@
-import { User, Briefcase, MapPin, Mail, Heart } from "lucide-react";
+"use client";
+
+import { User, Briefcase, MapPin, Mail, Heart, HeartOff } from "lucide-react";
+import { useFavoriteResume } from "~/hooks/useFavoriteResume";
 
 export function ResumeCard({ resume }: { resume: any }) {
+  const { isFavorite, handleAdd, handleDelete } = useFavoriteResume(resume.id);
+
   return (
     <div className="card bg-white shadow-md transition-all hover:shadow-lg">
       <div className="card-body">
@@ -9,9 +14,21 @@ export function ResumeCard({ resume }: { resume: any }) {
             <User className="mr-2 h-5 w-5" />
             {resume.name}
           </h2>
-          <button className="btn btn-sm btn-ghost text-red-500 hover:bg-red-100">
-            <Heart className="h-5 w-5" />
-          </button>
+          {isFavorite ? (
+            <button
+              className="btn btn-sm btn-ghost text-red-500 hover:bg-red-100"
+              onClick={handleDelete}
+            >
+              <HeartOff className="h-5 w-5" />
+            </button>
+          ) : (
+            <button
+              className="btn btn-sm btn-ghost text-red-500 hover:bg-red-100"
+              onClick={handleAdd}
+            >
+              <Heart className="h-5 w-5" />
+            </button>
+          )}
         </div>
 
         <p className="flex items-center text-cyan-900">
@@ -25,7 +42,7 @@ export function ResumeCard({ resume }: { resume: any }) {
 
         <div className="mt-4 flex justify-between">
           <button className="btn btn-outline btn-sm border-cyan-500 text-cyan-700 hover:bg-cyan-500 hover:text-white">
-            📄 Посмотреть профиль
+            <a href={`/seeker/${resume.id}`}>📄 Посмотреть профиль</a>
           </button>
           <a
             href={`mailto:${resume.email}`}

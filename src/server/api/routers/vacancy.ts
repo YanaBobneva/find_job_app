@@ -101,4 +101,68 @@ export const vacancyRouter = createTRPCRouter({
 
     return { success: true };
   }),
+  // 🔥 Мутация для добавления вакансии в избранное
+  addToFavorites: protectedProcedure
+    .input(z.object({ jobId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.session?.user.id;
+      if (!userId) throw new Error("User not authenticated");
+
+      try {
+        const favorite = await db.favoriteJob.create({
+          data: {
+            userId: userId,
+            jobId: input.jobId,
+          },
+        });
+
+        return { success: true, favorite };
+      } catch (error: any) {
+        if (error.code === "P2002") {
+          // Нарушение уникальности
+          throw new Error("Vacancy already in favorites");
+        }
+
+        console.error("Error adding to favorites:", error);
+        throw new Error("Failed to add vacancy to favorites");
+      }
+    }),
+    getFavoriteJobs: protectedProcedure.query(async ({ ctx }) => {
+      const userId = ctx.session?.user.id;
+      if (!userId) throw new Error("User not authenticated");
+
+      const favorites = await db.favoriteJob.findMany({
+        where: { userId: userId },
+        include: {
+          job: {
+            include: {
+              employer: {
+                include: {
+                  employerProfile: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      return favorites;
+    }),
+    deleteFromFavorites: protectedProcedure
+    .input(z.object({ jobId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.session?.user.id;
+      if (!userId) throw new Error("User not authenticated");
+
+      await db.favoriteJob.delete({
+        where: {
+          userId_jobId: {
+            userId: userId,
+            jobId: input.jobId,
+          },
+        },
+      });
+
+      return { success: true };
+    }),
 });

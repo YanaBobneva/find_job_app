@@ -6,7 +6,6 @@ import Image from "next/image";
 export default function SigninLink() {
   return (
     <div className="flex min-h-screen flex-col bg-gradient-to-br from-cyan-50 to-blue-50">
-      {/* Header */}
       <header className="sticky top-0 z-10 bg-white/80 px-6 py-4 shadow-md backdrop-blur-sm">
         <div className="mx-auto flex max-w-7xl items-center justify-between">
           <Link
@@ -37,12 +36,9 @@ export default function SigninLink() {
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="flex-1">
-        {/* Hero Section */}
         <section className="mx-auto max-w-7xl px-6 py-3 md:py-5">
           <div className="flex flex-col items-center gap-12 lg:flex-row lg:items-stretch lg:gap-16">
-            {/* Left Column - Text Content */}
             <div className="flex flex-1 flex-col justify-center lg:py-12">
               <h1 className="mb-6 text-4xl leading-tight font-bold text-cyan-900 md:text-5xl lg:text-6xl">
                 Найди работу <br className="hidden sm:block" />
@@ -79,11 +75,10 @@ export default function SigninLink() {
               </div>
             </div>
 
-            {/* Right Column - Image */}
             <div className="hidden flex-1 lg:flex lg:items-center lg:justify-end">
               <div className="relative h-full w-full overflow-hidden rounded-2xl">
                 <Image
-                  src="/find_job.png" // Замените на свою картинку
+                  src="/find_job.png"
                   alt="Человек находит работу"
                   width={600}
                   height={800}
@@ -96,7 +91,6 @@ export default function SigninLink() {
         </section>
       </main>
 
-      {/* Footer */}
       <footer className="bg-cyan-800 text-white">
         <div className="mx-auto max-w-7xl px-6 py-6 text-center text-sm text-cyan-300">
           © {new Date().getFullYear()} GoWork. Все права защищены.

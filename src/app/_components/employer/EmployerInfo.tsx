@@ -4,7 +4,13 @@ import { useState } from "react";
 import { Pencil } from "lucide-react";
 import { EditEmployerInfoModal } from "./EditEmployerInfoModal";
 
-export const EmployerInfo = ({ employer }: { employer: any }) => {
+export const EmployerInfo = ({
+  employer,
+  mode,
+}: {
+  employer: any;
+  mode: boolean;
+}) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
@@ -19,38 +25,53 @@ export const EmployerInfo = ({ employer }: { employer: any }) => {
         website: employer.website || "", // Если null, то пустая строка
       }
     : {
-        name: "Название компании",
-        description: "Описание компании",
-        email: "email компании",
-        phoneNumber: "Номер телефона компании",
-        website: "Сайт компании",
+        name: "",
+        description: "",
+        email: "",
+        phoneNumber: "",
+        website: "",
       };
 
   const employerExists = employer !== undefined && employer !== null;
 
   return (
     <div className="rounded-box relative bg-gradient-to-br from-cyan-100 to-cyan-200 p-6 shadow-lg">
-      <button
-        className="absolute top-4 right-4 cursor-pointer text-cyan-800 hover:text-cyan-600"
-        onClick={openModal}
-      >
-        <Pencil className="h-7 w-7" />
-      </button>
-
-      <h1 className="mb-2 text-3xl font-bold text-cyan-800">
-        {employerInfoToPass.name}
+      {mode && (
+        <button
+          className="absolute top-4 right-4 cursor-pointer text-cyan-800 hover:text-cyan-600"
+          onClick={openModal}
+        >
+          <Pencil className="h-7 w-7" />
+        </button>
+      )}
+      <h1 className="mb-2 text-3xl font-bold text-cyan-900">
+        Компания: {employerInfoToPass.name}
       </h1>
-      <p className="mb-1 text-cyan-900">{employerInfoToPass.description}</p>
+      <p className="mb-1 text-cyan-900">
+        <strong>Описание:</strong> {employerInfoToPass.description}
+      </p>
       <p className="text-sm text-cyan-700">
-        Контакты:{" "}
-        <a href={`mailto:${employerInfoToPass.email}`} className="underline">
-          {employerInfoToPass.email}
-        </a>
-        {"  "}|{"  "}
-        <a href={employerInfoToPass.website || ""} className="underline">
-          {employerInfoToPass.website}
-        </a>
-        {"  "}|{"  "}+7{employerInfoToPass.phoneNumber}
+        <span className="block">
+          <strong className="text-cyan-900">Почта:</strong>{" "}
+          <a href={`mailto:${employerInfoToPass.email}`} className="underline">
+            {employerInfoToPass.email}
+          </a>
+        </span>
+        <span className="block">
+          <strong className="text-cyan-900">Телефон:</strong>{" "}
+          <span>{employerInfoToPass.phoneNumber}</span>
+        </span>
+        <span className="block">
+          <strong className="text-cyan-900">Сайт:</strong>{" "}
+          <a
+            href={employerInfoToPass.website || "#"}
+            className="underline"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {employerInfoToPass.website}
+          </a>
+        </span>
       </p>
 
       {/* Выводим модальное окно с актуальными данными */}

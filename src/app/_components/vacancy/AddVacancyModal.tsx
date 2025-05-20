@@ -1,7 +1,14 @@
+"use client";
+
 import { Dialog, Transition } from "@headlessui/react";
-import { Fragment, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Fragment, useState, useEffect } from "react";
+import { CheckIcon } from "@heroicons/react/20/solid";
 import { experienceLevels } from "~/date/experienceLevels";
+import { cities } from "~/date/russia";
 import { api } from "~/trpc/react";
+import { Combobox } from "@headlessui/react";
+import { CitySelector } from "../citySelector";
 
 export function AddVacancyModal({
   isOpen,
@@ -19,6 +26,28 @@ export function AddVacancyModal({
   });
 
   const createMutation = api.vacancy.createVacancy.useMutation();
+  const router = useRouter();
+
+  const [query, setQuery] = useState("");
+  const [filteredCities, setFilteredCities] = useState<typeof cities>([]);
+
+  // Фильтрация городов с задержкой
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (query === "") {
+        setFilteredCities([]);
+      } else {
+        const lowerQuery = query.toLowerCase();
+        setFilteredCities(
+          cities
+            .filter((item) => item.city.toLowerCase().includes(lowerQuery))
+            .slice(0, 20), // показываем только первые 20 городов
+        );
+      }
+    }, 300);
+
+    return () => clearTimeout(timeout);
+  }, [query]);
 
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,6 +60,7 @@ export function AddVacancyModal({
         experienceLevel: formData.experienceLevel,
         salary: Number(formData.salary),
       });
+      router.refresh();
       onClose(); // Закрыть окно после успешного добавления
       // Очистить форму
       setFormData({
@@ -107,14 +137,11 @@ export function AddVacancyModal({
                   />
 
                   <label className="text-cyan-700">Местоположение</label>
-                  <input
-                    name="location"
-                    type="text"
-                    placeholder="Местоположение"
+                  <CitySelector
                     value={formData.location}
-                    onChange={handleChange}
-                    className="input input-bordered w-full"
-                    required
+                    onChange={(value) =>
+                      setFormData((prev) => ({ ...prev, location: value }))
+                    }
                   />
 
                   <label className="text-cyan-700">Опыт работы</label>
@@ -145,6 +172,7 @@ export function AddVacancyModal({
                     className="input input-bordered w-full"
                     required
                   />
+
                   <div className="flex justify-end gap-2">
                     <button type="button" className="btn" onClick={onClose}>
                       Отмена

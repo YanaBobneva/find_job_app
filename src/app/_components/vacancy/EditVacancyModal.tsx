@@ -1,7 +1,9 @@
 import { Dialog, Transition } from "@headlessui/react";
+import { useRouter } from "next/navigation";
 import { Fragment, useState } from "react";
 import { experienceLevels } from "~/date/experienceLevels";
 import { api } from "~/trpc/react";
+import { CitySelector } from "../citySelector";
 
 type EditVacancyModalProps = {
   isOpen: boolean;
@@ -31,12 +33,14 @@ export const EditVacancyModal = ({
   });
 
   const updateMutation = api.vacancy.updateVacancy.useMutation();
+  const router = useRouter();
 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
       await updateMutation.mutateAsync(formData);
+      router.refresh();
       onClose(); // Закрыть окно после успешного добавления
     } catch (error) {
       console.error("Ошибка при изменении вакансии:", error);
@@ -100,12 +104,11 @@ export const EditVacancyModal = ({
 
                   <div>
                     <label className="text-cyan-700">Местоположение</label>
-                    <input
-                      name="location"
-                      type="text"
+                    <CitySelector
                       value={formData.location}
-                      className="input input-bordered w-full"
-                      onChange={handleChange}
+                      onChange={(value) =>
+                        setFormData((prev) => ({ ...prev, location: value }))
+                      }
                     />
                   </div>
 

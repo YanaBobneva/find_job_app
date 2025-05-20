@@ -34,7 +34,9 @@ export default function ChooseRole({ user }: Props) {
             onChange={(e) => setRole(e.target.value)}
             name="role"
           >
-            <option value="">-- выберите --</option>
+            <option value="" disabled>
+              -- выберите --
+            </option>
             <option value="SEEKER">Соискатель</option>
             <option value="EMPLOYER">Работодатель</option>
           </select>

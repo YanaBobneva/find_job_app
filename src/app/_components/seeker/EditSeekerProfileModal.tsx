@@ -1,45 +1,114 @@
 "use client";
 
 import { Dialog, Transition } from "@headlessui/react";
+import { useRouter } from "next/navigation";
 import { Fragment, useState } from "react";
+import { experienceLevels } from "~/date/experienceLevels";
+import { api } from "~/trpc/react";
+import { CitySelector } from "../citySelector";
 
 type EditSeekerProfileModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  profile: {
+  seekerInfo: {
     name: string;
     surname: string;
     fathername: string;
     gender: string;
     birthday: string;
-    phoneNumber: number;
+    phoneNumber: string;
     email: string;
     education: string;
     resume: string;
     wish_job: string;
-    experienceLevel?: {
-      id: string;
-      name: string;
-    };
+    experienceLevel: string;
+    location: string;
   };
+  isExistingSeeker: boolean;
 };
-
-const experienceOptions = [
-  "Нет опыта",
-  "До года",
-  "1-3 года",
-  "4-6 лет",
-  "7 и более лет",
-];
 
 export const EditSeekerProfileModal = ({
   isOpen,
   onClose,
-  profile,
+  seekerInfo,
+  isExistingSeeker,
 }: EditSeekerProfileModalProps) => {
-  const [selectedExperience, setSelectedExperience] = useState(
-    profile.experienceLevel?.name ?? "Нет опыта",
-  );
+  const [formData, setFormData] = useState({
+    name: seekerInfo.name,
+    surname: seekerInfo.surname,
+    fathername: seekerInfo.fathername,
+    gender: seekerInfo.gender,
+    birthday: seekerInfo.birthday,
+    phoneNumber: seekerInfo.phoneNumber,
+    email: seekerInfo.email,
+    education: seekerInfo.education,
+    resume: seekerInfo.resume,
+    wish_job: seekerInfo.wish_job,
+    experienceLevel: seekerInfo.experienceLevel,
+    location: seekerInfo.location,
+  });
+
+  const genders = [
+    { id: "Мужской", name: "Мужской" },
+    { id: "Женский", name: "Женский" },
+  ];
+
+  const createMutation = api.seeker.createSeeker.useMutation();
+  const updateMutation = api.seeker.updateSeeker.useMutation();
+  const router = useRouter();
+
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    try {
+      if (isExistingSeeker) {
+        // Если существует, обновляем информацию
+        await updateMutation.mutateAsync({
+          name: formData.name,
+          surname: formData.surname,
+          fathername: formData.fathername,
+          gender: formData.gender,
+          birthday: new Date(formData.birthday),
+          phoneNumber: formData.phoneNumber,
+          email: formData.email,
+          education: formData.education,
+          resume: formData.resume,
+          wish_job: formData.wish_job,
+          experienceLevel: formData.experienceLevel,
+          location: formData.location,
+        });
+        router.refresh();
+      } else {
+        // Если нет, создаем новую
+        const seeker = await createMutation.mutateAsync({
+          name: formData.name,
+          surname: formData.surname,
+          fathername: formData.fathername,
+          gender: formData.gender,
+          birthday: new Date(formData.birthday),
+          phoneNumber: formData.phoneNumber,
+          email: formData.email,
+          education: formData.education,
+          resume: formData.resume,
+          wish_job: formData.wish_job,
+          experienceLevel: formData.experienceLevel,
+          location: formData.location,
+        });
+        router.push(`/seeker/${seeker.id}`);
+      }
+      onClose(); // Закрываем модал после успешного добавления/обновления
+    } catch (error) {
+      console.error("Ошибка при изменении информации о соискателе:", error);
+    }
+  };
+
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
+  ) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
   return (
     <Transition appear show={isOpen} as={Fragment}>
@@ -72,14 +141,20 @@ export const EditSeekerProfileModal = ({
                   Редактировать профиль соискателя
                 </Dialog.Title>
 
-                <form className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <form
+                  className="grid grid-cols-1 gap-4 sm:grid-cols-2"
+                  onSubmit={handleSave}
+                >
                   <div className="sm:col-span-2">
                     <label className="text-cyan-700">Фамилия</label>
                     <input
                       name="surname"
                       type="text"
-                      defaultValue={profile.surname}
+                      value={formData.surname}
+                      onChange={handleChange}
                       className="input input-bordered w-full"
+                      placeholder="Фамилия"
+                      required
                     />
                   </div>
                   <div>
@@ -87,8 +162,11 @@ export const EditSeekerProfileModal = ({
                     <input
                       name="name"
                       type="text"
-                      defaultValue={profile.name}
+                      value={formData.name}
+                      onChange={handleChange}
                       className="input input-bordered w-full"
+                      placeholder="Имя"
+                      required
                     />
                   </div>
                   <div>
@@ -96,26 +174,48 @@ export const EditSeekerProfileModal = ({
                     <input
                       name="fathername"
                       type="text"
-                      defaultValue={profile.fathername}
+                      value={formData.fathername}
+                      onChange={handleChange}
                       className="input input-bordered w-full"
+                      placeholder="Отчество"
+                      required
                     />
                   </div>
                   <div>
                     <label className="text-cyan-700">Пол</label>
-                    <input
+                    <select
                       name="gender"
-                      type="text"
-                      defaultValue={profile.gender}
-                      className="input input-bordered w-full"
-                    />
+                      value={formData.gender}
+                      onChange={handleChange}
+                      className="select select-bordered w-full"
+                      required
+                    >
+                      <option value="" disabled>
+                        Выберите пол
+                      </option>
+                      {genders.map((gender) => (
+                        <option key={gender.id} value={gender.id}>
+                          {gender.name}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                   <div>
                     <label className="text-cyan-700">Дата рождения</label>
                     <input
                       name="birthday"
                       type="date"
-                      defaultValue={profile.birthday.slice(0, 10)}
+                      value={
+                        formData.birthday
+                          ? new Date(formData.birthday)
+                              .toISOString()
+                              .slice(0, 10)
+                          : ""
+                      }
+                      onChange={handleChange}
                       className="input input-bordered w-full"
+                      placeholder="Дата рождения"
+                      required
                     />
                   </div>
                   <div>
@@ -123,8 +223,11 @@ export const EditSeekerProfileModal = ({
                     <input
                       name="phoneNumber"
                       type="tel"
-                      defaultValue={profile.phoneNumber}
+                      value={formData.phoneNumber}
+                      onChange={handleChange}
                       className="input input-bordered w-full"
+                      placeholder="Телефон"
+                      required
                     />
                   </div>
                   <div>
@@ -132,8 +235,11 @@ export const EditSeekerProfileModal = ({
                     <input
                       name="email"
                       type="email"
-                      defaultValue={profile.email}
+                      value={formData.email}
+                      onChange={handleChange}
                       className="input input-bordered w-full"
+                      placeholder="Email"
+                      required
                     />
                   </div>
                   <div className="sm:col-span-2">
@@ -141,17 +247,23 @@ export const EditSeekerProfileModal = ({
                     <input
                       name="education"
                       type="text"
-                      defaultValue={profile.education}
+                      value={formData.education}
+                      onChange={handleChange}
                       className="input input-bordered w-full"
+                      placeholder="Образование"
+                      required
                     />
                   </div>
                   <div className="sm:col-span-2">
                     <label className="text-cyan-700">Резюме</label>
                     <textarea
                       name="resume"
-                      defaultValue={profile.resume}
+                      value={formData.resume}
+                      onChange={handleChange}
                       rows={4}
                       className="textarea textarea-bordered w-full"
+                      placeholder="Укажите свои навыки и предыдущие места работы"
+                      required
                     />
                   </div>
                   <div className="sm:col-span-2">
@@ -159,24 +271,41 @@ export const EditSeekerProfileModal = ({
                     <input
                       name="wish_job"
                       type="text"
-                      defaultValue={profile.wish_job}
+                      value={formData.wish_job}
+                      onChange={handleChange}
                       className="input input-bordered w-full"
+                      placeholder="Укажите желаемую должность"
+                      required
                     />
                   </div>
                   <div className="sm:col-span-2">
-                    <label className="text-cyan-700">Опыт</label>
+                    <label className="text-cyan-700">Опыт работы</label>
                     <select
                       name="experienceLevel"
                       className="select select-bordered w-full"
-                      value={selectedExperience}
-                      onChange={(e) => setSelectedExperience(e.target.value)}
+                      value={formData.experienceLevel}
+                      onChange={handleChange}
+                      required
                     >
-                      {experienceOptions.map((option) => (
-                        <option key={option} value={option}>
-                          {option}
+                      <option value="" disabled>
+                        Выберите уровень опыта
+                      </option>
+                      {experienceLevels.map((level) => (
+                        <option key={level.id} value={level.id}>
+                          {level.name}
                         </option>
                       ))}
                     </select>
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <label className="text-cyan-700">Город</label>
+                    <CitySelector
+                      value={formData.location}
+                      onChange={(value) =>
+                        setFormData((prev) => ({ ...prev, location: value }))
+                      }
+                    />
                   </div>
 
                   <div className="col-span-2 mt-4 flex justify-end gap-2">

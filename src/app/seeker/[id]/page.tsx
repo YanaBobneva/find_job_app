@@ -1,21 +1,26 @@
 import SeekerInfo from "~/app/_components/seeker/SeekerInfo";
+import { auth } from "~/server/auth";
+import { db } from "~/server/db";
 
-export default function SeekerPage() {
-  const profile = {
-    id: "abc123",
-    name: "Иван",
-    surname: "Петров",
-    fathername: "Алексеевич",
-    gender: "Мужской",
-    birthday: "1998-05-12T00:00:00Z",
-    phoneNumber: 79991234567,
-    email: "ivan.petrov@example.com",
-    education: "МГТУ им. Баумана, Прикладная информатика",
-    resume:
-      "Опыт работы: 2 года фронтенда, React, TypeScript. Проекты: CRM, ERP. Навыки: адаптивная вёрстка, CI/CD.",
-    wish_job: "Фронтенд-разработчик",
-    experienceLevel: "Без опыта",
-  };
+export default async function SeekerPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const seeker = await db.seekerProfile.findUnique({
+    where: { id: (await params).id },
+    include: {
+      user: {
+        include: {
+          jobs: true,
+        },
+      },
+    },
+  });
 
-  return <SeekerInfo profile={profile} />;
+  const session = await auth();
+  const role = session?.user.role;
+  const mode = role === "SEEKER";
+
+  return <SeekerInfo seeker={seeker} mode={mode} />;
 }

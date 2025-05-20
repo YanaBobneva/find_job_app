@@ -49,6 +49,7 @@ export const EditEmployerInfoModal = ({
           email: formData.email,
           website: formData.website,
         });
+        router.refresh();
       } else {
         // Если компании нет, создаем новую
         const employer = await createMutation.mutateAsync({

@@ -65,8 +65,9 @@ model User {
     seekerProfile   SeekerProfile?
     employerProfile EmployerProfile?
 
-    jobs         Job[]         @relation("EmployerJobs")
-    applications Application[]
+    jobs            Job[]            @relation("EmployerJobs")
+    favoriteJobs    FavoriteJob[]    @relation("UserFavoriteJobs")
+    favoriteSeekers FavoriteSeeker[] @relation("EmployerFavorites")
 
     role Role?
 }
@@ -79,16 +80,17 @@ model SeekerProfile {
     fathername  String
     gender      String
     birthday    DateTime
-    phoneNumber Int
+    phoneNumber String
     email       String
 
+    location        String
     education       String
     resume          String
     wish_job        String
-    // experienceLevelId String?
-    // experienceLevel   ExperienceLevel? @relation(fields: [experienceLevelId], references: [id])
     experienceLevel String
-    user            User   @relation(fields: [userId], references: [id])
+
+    user    User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+    likedBy FavoriteSeeker[] @relation("LikedSeeker")
 }
 
 model EmployerProfile {
@@ -99,7 +101,8 @@ model EmployerProfile {
     phoneNumber String
     email       String?
     website     String?
-    user        User    @relation(fields: [userId], references: [id])
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Job {
@@ -108,45 +111,43 @@ model Job {
     description     String
     location        String
     salary          Int
-    // experienceLevel   ExperienceLevel @relation(fields: [experienceLevelId], references: [id])
-    // experienceLevelId String
     experienceLevel String
-    // category          Category        @relation(fields: [categoryId], references: [id])
-    // categoryId        String
     createdAt       DateTime @default(now())
     updatedAt       DateTime @updatedAt
 
-    employer   User   @relation("EmployerJobs", fields: [employerId], references: [id])
+    employer   User   @relation("EmployerJobs", fields: [employerId], references: [id], onDelete: Cascade)
     employerId String
 
-    applications Application[]
+    likedBy FavoriteJob[] @relation("LikedJob")
 }
 
-model Application {
-    id        String   @id @default(cuid())
-    jobId     String
-    userId    String
+model FavoriteJob {
+    id     String @id @default(cuid())
+    user   User   @relation("UserFavoriteJobs", fields: [userId], references: [id], onDelete: Cascade)
+    userId String
+
+    job   Job    @relation("LikedJob", fields: [jobId], references: [id], onDelete: Cascade)
+    jobId String
+
     createdAt DateTime @default(now())
 
-    job  Job  @relation(fields: [jobId], references: [id])
-    user User @relation(fields: [userId], references: [id])
+    @@unique([userId, jobId])
 }
 
-// model Category {
-//     id   String @id @default(cuid())
-//     name String @unique
-//     jobs Job[]
-// }
+model FavoriteSeeker {
+    id         String @id @default(cuid())
+    employer   User   @relation("EmployerFavorites", fields: [employerId], references: [id], onDelete: Cascade)
+    employerId String
 
-// model ExperienceLevel {
-//     id            String          @id @default(cuid())
-//     name          String          @unique
-//     jobs          Job[]
-//     SeekerProfile SeekerProfile[]
-// }
+    seeker   SeekerProfile @relation("LikedSeeker", fields: [seekerId], references: [id], onDelete: Cascade)
+    seekerId String
+
+    createdAt DateTime @default(now())
+
+    @@unique([employerId, seekerId])
+}
 
 enum Role {
     SEEKER
     EMPLOYER
-    ADMIN
 }

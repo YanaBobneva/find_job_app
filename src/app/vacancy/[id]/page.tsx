@@ -5,11 +5,11 @@ import { auth } from "~/server/auth";
 export default async function VacancyPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   const vacancy = await db.job.findUnique({
-    where: { id: params.id },
-    include: { employer: true, applications: true },
+    where: { id: (await params).id },
+    include: { employer: { include: { employerProfile: true } } },
   });
 
   const session = await auth();
