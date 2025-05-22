@@ -4,10 +4,14 @@ import { TRPCError } from "@trpc/server";
 
 export const userRouter = createTRPCRouter({
   deleteUser: protectedProcedure
-    .input(z.object({ userId: z.string() }))
-    .mutation(async ({ ctx, input }) => {
+    .mutation(async ({ ctx }) => {
+      const userId = ctx.session.user.id;
+      if (!userId) {
+        throw new TRPCError({ code: "UNAUTHORIZED", message: "User not authenticated" });
+      }
+
       const existingUser = await ctx.db.user.findUnique({
-        where: { id: input.userId },
+        where: { id: userId },
       });
 
       if (!existingUser) {
@@ -15,7 +19,7 @@ export const userRouter = createTRPCRouter({
       }
 
       await ctx.db.user.delete({
-        where: { id: input.userId },
+        where: { id: userId },
       });
 
       return { success: true };
@@ -23,12 +27,14 @@ export const userRouter = createTRPCRouter({
   updateEmail: protectedProcedure
   .input(
     z.object({
-      userId: z.string(),
       newEmail: z.string().email(),
     })
   )
   .mutation(async ({ ctx, input }) => {
-    const { userId, newEmail } = input;
+    const userId = ctx.session.user.id;
+    if (!userId) {
+      throw new TRPCError({ code: "UNAUTHORIZED", message: "User not authenticated" });
+    }
 
     const existingUser = await ctx.db.user.findUnique({
       where: { id: userId },
@@ -39,7 +45,7 @@ export const userRouter = createTRPCRouter({
     }
 
     const emailInUse = await ctx.db.user.findUnique({
-      where: { email: newEmail },
+      where: { email: input.newEmail },
     });
 
     if (emailInUse && emailInUse.id !== userId) {
@@ -51,7 +57,7 @@ export const userRouter = createTRPCRouter({
 
     await ctx.db.user.update({
       where: { id: userId },
-      data: { email: newEmail },
+      data: { email: input.newEmail },
     });
 
     return { success: true };

@@ -1,4 +1,6 @@
+import { $Enums } from "@prisma/client";
 import { z } from "zod";
+import { requireRole } from "~/app/api/auth/check";
 import {
   createTRPCRouter,
   protectedProcedure,
@@ -29,11 +31,7 @@ export const seekerRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const userId = ctx.session?.user.id;
-
-      if (!userId) {
-        throw new Error("User not authenticated");
-      }
+    const userId = requireRole(ctx, $Enums.Role.SEEKER);
 
       const newSeeker = await db.seekerProfile.create({
         data: {
@@ -75,11 +73,7 @@ export const seekerRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const userId = ctx.session?.user.id;
-
-      if (!userId) {
-        throw new Error("User not authenticated");
-      }
+      const userId = requireRole(ctx, $Enums.Role.SEEKER);
 
       const updatedSeeker = await db.seekerProfile.update({
         where: { userId },
@@ -101,14 +95,11 @@ export const seekerRouter = createTRPCRouter({
 
       return updatedSeeker;
     }),
-    // 🔹 Добавление соискателя в избранное
+    // Добавление соискателя в избранное
   addToFavorites: protectedProcedure
     .input(z.object({ seekerId: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      const employerId = ctx.session?.user.id;
-      if (!employerId) {
-        throw new Error("User not authenticated");
-      }
+      const employerId = requireRole(ctx, $Enums.Role.EMPLOYER);
 
       try {
         const favorite = await db.favoriteSeeker.create({
@@ -128,8 +119,10 @@ export const seekerRouter = createTRPCRouter({
       }
     }),
     getFavoriteSeekers: protectedProcedure.query(async ({ ctx }) => {
-      const userId = ctx.session?.user.id;
-      if (!userId) throw new Error("User not authenticated");
+      const userId = ctx.session.user.id
+      if (!userId) {
+        throw new Error("User not authenticated");
+      }
 
       const favorites = await db.favoriteSeeker.findMany({
         where: { employerId: userId },
@@ -140,12 +133,11 @@ export const seekerRouter = createTRPCRouter({
 
       return favorites;
     }),
-      // 🔹 Удаление соискателя из избранного
+      //  Удаление соискателя из избранного
   deleteFromFavorites: protectedProcedure
     .input(z.object({ seekerId: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      const employerId = ctx.session?.user.id;
-      if (!employerId) throw new Error("User not authenticated");
+    const employerId = requireRole(ctx, $Enums.Role.EMPLOYER);
 
       await db.favoriteSeeker.delete({
         where: {

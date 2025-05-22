@@ -20,7 +20,7 @@ export default async function SeekerPage({
 
   const session = await auth();
   const role = session?.user.role;
-  const mode = role === "SEEKER";
+  const mode = role === "SEEKER" && seeker?.userId === session?.user.id;
 
-  return <SeekerInfo seeker={seeker} mode={mode} />;
+  return <SeekerInfo seeker={seeker} mode={mode} role={role} />;
 }

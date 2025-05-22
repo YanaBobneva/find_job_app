@@ -9,7 +9,6 @@ type Props = {
     id: string;
     email: string;
     emailVerified: Date | null;
-    image: string | null;
     createdAt: Date;
     updatedAt: Date;
     role: $Enums.Role | null;

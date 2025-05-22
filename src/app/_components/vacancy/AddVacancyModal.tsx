@@ -3,11 +3,9 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { useRouter } from "next/navigation";
 import { Fragment, useState, useEffect } from "react";
-import { CheckIcon } from "@heroicons/react/20/solid";
 import { experienceLevels } from "~/date/experienceLevels";
 import { cities } from "~/date/russia";
 import { api } from "~/trpc/react";
-import { Combobox } from "@headlessui/react";
 import { CitySelector } from "../citySelector";
 
 export function AddVacancyModal({

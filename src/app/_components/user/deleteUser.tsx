@@ -4,7 +4,7 @@ import { signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { api } from "~/trpc/react";
 
-export default function DeleteUser({ userId }: { userId: string | undefined }) {
+export default function DeleteUser() {
   const deleteMutation = api.user.deleteUser.useMutation();
   const router = useRouter();
 
@@ -12,9 +12,8 @@ export default function DeleteUser({ userId }: { userId: string | undefined }) {
     e.preventDefault();
 
     try {
-      await deleteMutation.mutateAsync({ userId: userId! });
-      await signOut({ redirect: false }); // отключаем автоматический редирект
-      router.push("/"); // делаем редирект вручную после signOut
+      await deleteMutation.mutateAsync();
+      await signOut({ callbackUrl: "/" });
     } catch (error) {
       console.error("Ошибка при удалении вакансии:", error);
     }

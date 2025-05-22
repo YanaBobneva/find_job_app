@@ -13,10 +13,12 @@ export function VacancyInfo({
   vacancy,
   role,
   employerId,
+  mode,
 }: {
   vacancy: any;
   role: any;
   employerId: string | undefined;
+  mode: boolean;
 }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { isFavorite, handleAdd, handleDelete } = useFavoriteVacancy(
@@ -42,7 +44,7 @@ export function VacancyInfo({
         <div className="mb-4 flex items-start justify-between">
           <h1 className="text-3xl font-bold text-cyan-800">{vacancy.title}</h1>
 
-          {role === "EMPLOYER" ? (
+          {mode && (
             <div className="flex space-x-4">
               <button
                 className="text-cyan-800 hover:text-cyan-600"
@@ -57,7 +59,8 @@ export function VacancyInfo({
                 <Trash2 className="h-6 w-6" />
               </button>
             </div>
-          ) : (
+          )}
+          {role === "SEEKER" && (
             <div className="flex space-x-4">
               <button
                 className="btn flex space-x-2 bg-white text-cyan-800 shadow-md hover:bg-cyan-600"
@@ -95,7 +98,7 @@ export function VacancyInfo({
         </h2>
         <p className="mt-4 text-cyan-900">{vacancy.description}</p>
       </div>
-      {role === "SEEKER" && (
+      {!mode && (
         <div className="rounded-box mt-6 flex flex-col items-center justify-between gap-4 bg-white p-6 shadow-lg sm:flex-row">
           <div className="text-cyan-800">
             <h2 className="mb-1 text-lg font-semibold text-cyan-800">

@@ -1,4 +1,6 @@
+import { $Enums } from "@prisma/client";
 import { z } from "zod";
+import { requireRole } from "~/app/api/auth/check";
 import {
   createTRPCRouter,
   protectedProcedure, // если хотите защитить роут
@@ -18,11 +20,12 @@ export const vacancyRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      // Получаем userId из контекста
-      const userId = ctx.session?.user.id;
-
-      if (!userId) {
-        throw new Error("User not authenticated"); // Если userId нет, выбрасываем ошибку
+      const userId = requireRole(ctx, $Enums.Role.EMPLOYER);
+      const employer = await db.employerProfile.findUnique({
+        where: { userId },
+      });
+      if (!employer) {
+        throw new Error("Профиль работодателя не найден: Заполните профиль!!!");
       }
 
       // Создание записи о вакансии в базе данных
@@ -54,13 +57,15 @@ export const vacancyRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const userId = ctx.session?.user.id;
+    const userId = requireRole(ctx, $Enums.Role.EMPLOYER);
+    const vacancy = await db.job.findUnique({
+      where: { id: input.jobId },
+      select: { employerId: true },
+    });
 
-      if (!userId) {
-        throw new Error("User not authenticated");
-      }
-
-      // ДОБАВИТЬ ОГРАНИЧЕНИЯ ПО РОЛИ !!!
+    if (!vacancy || vacancy.employerId !== userId) {
+      throw new Error("Access denied: you are not the owner of this vacancy");
+    }
 
       // Обновление информации о вакансии
       const updatedVacancy = await db.job.update({
@@ -81,9 +86,7 @@ export const vacancyRouter = createTRPCRouter({
   deleteVacancy: protectedProcedure
   .input(z.object({ jobId: z.string() }))
   .mutation(async ({ ctx, input }) => {
-    const userId = ctx.session?.user.id;
-    if (!userId) throw new Error("User not authenticated");
-
+    const userId = requireRole(ctx, $Enums.Role.EMPLOYER);
     // Проверка, принадлежит ли вакансия текущему пользователю
     const vacancy = await db.job.findUnique({
       where: { id: input.jobId },
@@ -101,12 +104,11 @@ export const vacancyRouter = createTRPCRouter({
 
     return { success: true };
   }),
-  // 🔥 Мутация для добавления вакансии в избранное
+  // Мутация для добавления вакансии в избранное
   addToFavorites: protectedProcedure
     .input(z.object({ jobId: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      const userId = ctx.session?.user.id;
-      if (!userId) throw new Error("User not authenticated");
+      const userId = requireRole(ctx, $Enums.Role.SEEKER);
 
       try {
         const favorite = await db.favoriteJob.create({
@@ -128,8 +130,10 @@ export const vacancyRouter = createTRPCRouter({
       }
     }),
     getFavoriteJobs: protectedProcedure.query(async ({ ctx }) => {
-      const userId = ctx.session?.user.id;
-      if (!userId) throw new Error("User not authenticated");
+      const userId = ctx.session.user.id
+      if (!userId) {
+        throw new Error("User not authenticated");
+      }
 
       const favorites = await db.favoriteJob.findMany({
         where: { userId: userId },
@@ -151,8 +155,7 @@ export const vacancyRouter = createTRPCRouter({
     deleteFromFavorites: protectedProcedure
     .input(z.object({ jobId: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      const userId = ctx.session?.user.id;
-      if (!userId) throw new Error("User not authenticated");
+      const userId = requireRole(ctx, $Enums.Role.SEEKER);
 
       await db.favoriteJob.delete({
         where: {

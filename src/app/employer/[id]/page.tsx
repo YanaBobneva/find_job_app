@@ -21,7 +21,7 @@ export default async function EmployerPage({
   });
   const session = await auth();
   const role = session?.user.role;
-  const mode = role === "EMPLOYER";
+  const mode = role === "EMPLOYER" && employer?.userId === session?.user.id;
 
   return (
     <div className="mx-auto max-w-6xl space-y-8 p-6">

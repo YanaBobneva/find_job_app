@@ -1,4 +1,3 @@
-// components/CitySelector.tsx
 import { useState, useEffect } from "react";
 import { Combobox } from "@headlessui/react";
 import { CheckIcon } from "@heroicons/react/20/solid";

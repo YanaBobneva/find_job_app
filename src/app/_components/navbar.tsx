@@ -10,17 +10,14 @@ export function Navbar({
   session,
   seekerId,
   employerId,
-  // favoriteJobs,
-  // FavoriteSeekers,
 }: {
   session: Session;
   seekerId?: string;
   employerId?: string;
-  // favoriteJobs?: any[];
-  // FavoriteSeekers?: any[];
 }) {
   const favoriteJobs = api.vacancy.getFavoriteJobs.useQuery();
   const favoriteSeekers = api.seeker.getFavoriteSeekers.useQuery();
+
   return (
     <div className="navbar bg-cyan-100 px-6 shadow-md">
       <div className="flex flex-1 items-center gap-2">

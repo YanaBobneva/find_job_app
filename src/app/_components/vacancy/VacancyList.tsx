@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { api } from "~/trpc/react";
 
 type Vacancy = {
   id: string;

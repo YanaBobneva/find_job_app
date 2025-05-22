@@ -22,12 +22,16 @@ export default async function VacancyPage({
     return <div>Вакансия не найдена</div>;
   }
 
+  const mode =
+    user?.role === "EMPLOYER" && session?.user.id === vacancy.employerId;
+
   return (
     <div className="mx-auto max-w-6xl p-6">
       <VacancyInfo
         vacancy={vacancy}
         role={user?.role}
         employerId={employer?.id}
+        mode={mode}
       />
     </div>
   );

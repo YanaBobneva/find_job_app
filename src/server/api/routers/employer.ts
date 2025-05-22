@@ -1,7 +1,9 @@
+import { $Enums } from "@prisma/client";
 import { z } from "zod";
+import { requireRole } from "~/app/api/auth/check";
 import {
   createTRPCRouter,
-  protectedProcedure, // если хотите защитить роут
+  protectedProcedure,
 } from "~/server/api/trpc";
 import { db } from "~/server/db";
 
@@ -18,13 +20,9 @@ export const employerRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      // Получаем userId из контекста
-      const userId = ctx.session?.user.id; // Предположим, что userId хранится в session.user.id
+      // можно только если ты авторизован и выбрал роль работодателя
+      const userId = requireRole(ctx, $Enums.Role.EMPLOYER);
 
-      if (!userId) {
-        throw new Error("User not authenticated"); // Если userId нет, то выбрасываем ошибку
-      }
-      // Создание записи в базе данных
       const newEmployer = await db.employerProfile.create({
         data: {
           userId,
@@ -36,7 +34,6 @@ export const employerRouter = createTRPCRouter({
         },
       });
 
-      // Возвращаем созданного работодателя
       return newEmployer;
     }),
 
@@ -52,11 +49,9 @@ export const employerRouter = createTRPCRouter({
     })
   )
   .mutation(async ({ ctx, input }) => {
-    const userId = ctx.session?.user.id;
-
-    if (!userId) {
-      throw new Error("User not authenticated");
-    }
+    // можно только если ты авторизован и являешься работодателем 
+    // проверять что данные принадлежат тому кто хочет их изменить нет необходимости так как изменения происходят через userId = ctx.session?.user.id
+    const userId = requireRole(ctx, $Enums.Role.EMPLOYER);
 
     const updatedEmployerInfo = await db.employerProfile.update({
       where: { userId },

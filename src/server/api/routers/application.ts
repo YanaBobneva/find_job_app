@@ -2,6 +2,8 @@ import nodemailer from "nodemailer";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { z } from "zod";
 import { db } from "~/server/db";
+import { requireRole } from "~/app/api/auth/check";
+import { $Enums } from "@prisma/client";
 
 export const contactRouter = createTRPCRouter({
   sendApplication: protectedProcedure
@@ -10,15 +12,13 @@ export const contactRouter = createTRPCRouter({
       vacancyId: z.string(),
     }))
     .mutation(async ({ ctx, input }) => {
-      const userId = ctx.session.user.id;
-
-      // 1. Получаем данные соискателя из БД
+      // можно только если ты авторизован, если ты соискатель и у тебя заполнен профиль
+      const userId = requireRole(ctx, $Enums.Role.SEEKER);
       const seeker = await db.seekerProfile.findUnique({
         where: { userId },
       });
-
       if (!seeker) {
-        throw new Error("Профиль соискателя не найден");
+        throw new Error("Профиль соискателя не найден: Заполните профиль!!!");
       }
 
       // 2. Настраиваем почтовый транспорт

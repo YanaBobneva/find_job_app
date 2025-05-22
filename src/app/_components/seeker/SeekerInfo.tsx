@@ -3,13 +3,16 @@
 import { useState } from "react";
 import { EditSeekerProfileModal } from "../../_components/seeker/EditSeekerProfileModal";
 import { useFavoriteResume } from "~/hooks/useFavoriteResume";
+import type { Role } from "@prisma/client";
 
 export default function SeekerInfo({
   seeker,
   mode,
+  role,
 }: {
   seeker: any;
   mode: boolean;
+  role: Role | null | undefined;
 }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { isFavorite, handleAdd, handleDelete } = seeker
@@ -55,14 +58,15 @@ export default function SeekerInfo({
           <h1 className="text-3xl font-bold text-cyan-800">
             Профиль соискателя
           </h1>
-          {mode ? (
+          {mode && (
             <button
               className="btn btn-outline btn-sm border-cyan-500 text-cyan-700 hover:bg-cyan-500 hover:text-white"
               onClick={() => setIsModalOpen(true)}
             >
               Редактировать профиль
             </button>
-          ) : (
+          )}
+          {role === "EMPLOYER" && (
             <button
               className="btn btn-outline btn-sm border-red-500 text-red-700 hover:bg-red-500 hover:text-white"
               onClick={isFavorite ? handleDelete : handleAdd}

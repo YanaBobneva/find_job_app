@@ -12,7 +12,7 @@ export default async function AccountSettingsPage() {
         Настройки аккаунта
       </h1>
       <UpdateUser user={user} />
-      <DeleteUser userId={user?.id} />
+      <DeleteUser />
     </div>
   );
 }
