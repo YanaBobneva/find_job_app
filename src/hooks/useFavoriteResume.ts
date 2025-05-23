@@ -12,8 +12,8 @@ export function useFavoriteResume(seekerId: string) {
             utils.seeker.getFavoriteSeekers.invalidate();
             toast.success("Резюме добавлено в избранное");
         },
-        onError: () => {
-            toast.error("Произошла ошибка при добавлении резюме в избранное");
+        onError: (error) => {
+            toast.error(error.message);
         },
     });
     const deleteFromFavorites = api.seeker.deleteFromFavorites.useMutation({

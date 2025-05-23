@@ -18,7 +18,7 @@ export const contactRouter = createTRPCRouter({
         where: { userId },
       });
       if (!seeker) {
-        throw new Error("Профиль соискателя не найден: Заполните профиль!!!");
+        throw new Error("Произошла ошибка. Необходимо заполнить профиль");
       }
 
       // 2. Настраиваем почтовый транспорт

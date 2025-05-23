@@ -41,6 +41,7 @@ export const EditEmployerForm = ({
           {type === "textarea" ? (
             <textarea
               name={name}
+              placeholder={label}
               value={(formData as any)[name]}
               onChange={onChange}
               className="textarea textarea-bordered w-full"
@@ -48,6 +49,7 @@ export const EditEmployerForm = ({
             />
           ) : (
             <input
+              placeholder={label}
               name={name}
               type="text"
               value={(formData as any)[name]}

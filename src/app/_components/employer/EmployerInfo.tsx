@@ -36,7 +36,7 @@ export const EmployerInfo = ({
 
   return (
     <div className="rounded-box relative bg-gradient-to-br from-cyan-100 to-cyan-200 p-6 shadow-lg">
-      {mode && (
+      {(mode || !employerExists) && (
         <button
           className="absolute top-4 right-4 cursor-pointer text-cyan-800 hover:text-cyan-600"
           onClick={openModal}

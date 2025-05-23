@@ -66,4 +66,16 @@ export const employerRouter = createTRPCRouter({
 
     return updatedEmployerInfo;
   }),
+  getEmployer: protectedProcedure.query(async ({ ctx }) => {
+      const userId = ctx.session.user.id
+      if (!userId) {
+        throw new Error("User not authenticated");
+      }
+
+    const employer = await db.employerProfile.findFirst({
+      where: { userId: userId },
+    });
+
+    return employer;
+  }),
 });

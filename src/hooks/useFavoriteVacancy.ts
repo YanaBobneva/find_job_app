@@ -15,11 +15,7 @@ export function useFavoriteVacancy(vacancyId: string) {
       toast.success("Вакансия добавлена в избранное");
     },
     onError: (error) => {
-      toast.error(
-        error.message === "Vacancy already in favorites"
-          ? "Вакансия уже в избранном"
-          : "Ошибка при добавлении",
-      );
+      toast.error(error.message);
     },
   });
 

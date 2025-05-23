@@ -122,11 +122,11 @@ export const vacancyRouter = createTRPCRouter({
       } catch (error: any) {
         if (error.code === "P2002") {
           // Нарушение уникальности
-          throw new Error("Vacancy already in favorites");
+          throw new Error("Вакансия уже в избранном");
         }
 
         console.error("Error adding to favorites:", error);
-        throw new Error("Failed to add vacancy to favorites");
+        throw new Error("При добавлении вакансии в избранное произошла ошибка");
       }
     }),
     getFavoriteJobs: protectedProcedure.query(async ({ ctx }) => {

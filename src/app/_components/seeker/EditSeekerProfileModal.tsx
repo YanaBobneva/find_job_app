@@ -56,6 +56,7 @@ export const EditSeekerProfileModal = ({
   const createMutation = api.seeker.createSeeker.useMutation();
   const updateMutation = api.seeker.updateSeeker.useMutation();
   const router = useRouter();
+  const utils = api.useUtils();
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -94,6 +95,7 @@ export const EditSeekerProfileModal = ({
           experienceLevel: formData.experienceLevel,
           location: formData.location,
         });
+        await utils.seeker.getSeeker.refetch();
         router.push(`/seeker/${seeker.id}`);
       }
       onClose(); // Закрываем модал после успешного добавления/обновления

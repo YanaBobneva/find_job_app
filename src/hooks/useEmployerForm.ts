@@ -24,6 +24,7 @@ export const useEmployerForm = (
   });
 
   const router = useRouter();
+  const utils = api.useUtils();
   const createMutation = api.employer.createEmployer.useMutation();
   const updateMutation = api.employer.updateEmployerInfo.useMutation();
 
@@ -55,6 +56,7 @@ export const useEmployerForm = (
           email: formData.email,
           website: formData.website,
         });
+        await utils.employer.getEmployer.refetch();
         router.push(`/employer/${employer.id}`);
       }
       onSuccess();

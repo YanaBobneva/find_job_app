@@ -112,10 +112,10 @@ export const seekerRouter = createTRPCRouter({
         return { success: true, favorite };
       } catch (error: any) {
         if (error.code === "P2002") {
-          throw new Error("Seeker already in favorites");
+          throw new Error("Резюме уже в избранном");
         }
         console.error("Error adding seeker to favorites:", error);
-        throw new Error("Failed to add seeker to favorites");
+        throw new Error("При добавлении резюме в избранное произошла ошибка");
       }
     }),
     getFavoriteSeekers: protectedProcedure.query(async ({ ctx }) => {
@@ -149,5 +149,17 @@ export const seekerRouter = createTRPCRouter({
       });
 
       return { success: true };
+    }),
+    getSeeker: protectedProcedure.query(async ({ ctx }) => {
+      const userId = ctx.session.user.id
+      if (!userId) {
+        throw new Error("User not authenticated");
+      }
+
+      const seeker = await db.seekerProfile.findFirst({
+        where: { userId: userId },
+      });
+
+      return seeker;
     }),
 });

@@ -21,14 +21,12 @@ export const VacancyList = ({ vacancies }: VacancyListProps) => {
             key={vacancy.id}
             className="flex items-center justify-between border-b border-cyan-300 bg-white p-4 shadow-sm"
           >
-            <div>
-              <Link
-                href={`/vacancy/${vacancy.id}`} // Добавляем динамическую ссылку на вакансию
-                className="text-lg font-medium text-cyan-700 hover:text-cyan-900"
-              >
-                {vacancy.title}
-              </Link>
-            </div>
+            <Link
+              href={`/vacancy/${vacancy.id}`} // Добавляем динамическую ссылку на вакансию
+              className="text-lg font-medium text-cyan-700 hover:text-cyan-900"
+            >
+              {vacancy.title}
+            </Link>
           </div>
         ))
       )}

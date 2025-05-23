@@ -6,17 +6,11 @@ import { CircleUserRound, Heart } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { api } from "~/trpc/react";
 
-export function Navbar({
-  session,
-  seekerId,
-  employerId,
-}: {
-  session: Session;
-  seekerId?: string;
-  employerId?: string;
-}) {
+export function Navbar({ session }: { session: Session }) {
   const favoriteJobs = api.vacancy.getFavoriteJobs.useQuery();
   const favoriteSeekers = api.seeker.getFavoriteSeekers.useQuery();
+  const seeker = api.seeker.getSeeker.useQuery();
+  const employer = api.employer.getEmployer.useQuery();
 
   return (
     <div className="navbar bg-cyan-100 px-6 shadow-md">
@@ -40,6 +34,7 @@ export function Navbar({
             className="btn btn-sm btn-ghost mr-2 h-10 w-10 p-0 hover:bg-red-100"
             tabIndex={0}
             role="button"
+            data-testid="favorite-button"
             disabled={!session.user.role}
           >
             <Heart className="h-8 w-8 text-red-500" />
@@ -102,8 +97,8 @@ export function Navbar({
               <Link
                 href={
                   session.user.role === "SEEKER"
-                    ? `/seeker/${seekerId}`
-                    : `/employer/${employerId}`
+                    ? `/seeker/${seeker.data?.id}`
+                    : `/employer/${employer.data?.id}`
                 }
                 className="text-sm font-medium text-cyan-700 hover:text-cyan-900"
               >

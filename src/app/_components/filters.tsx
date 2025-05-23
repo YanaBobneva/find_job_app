@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Filter } from "lucide-react";
 import { experienceLevels } from "~/date/experienceLevels";
 import { CitySelector } from "./citySelector";
+import { buildQuery } from "~/lib/buildQuery";
 
 export function Filters() {
   const router = useRouter();
@@ -27,13 +28,7 @@ export function Filters() {
   };
 
   const handleApplyFilters = () => {
-    const params = new URLSearchParams();
-
-    if (filters.city) params.set("city", filters.city);
-    if (filters.experience) params.set("experience", filters.experience);
-    if (filters.job) params.set("job", filters.job);
-
-    router.push(`/?${params.toString()}`);
+    router.push(buildQuery(filters));
   };
 
   const handleResetFilters = () => {
@@ -59,10 +54,11 @@ export function Filters() {
 
         {/* Опыт */}
         <div className="form-control w-48">
-          <label className="label">
+          <label htmlFor="experience" className="label">
             <span className="label-text text-cyan-800">Опыт</span>
           </label>
           <select
+            id="experience"
             name="experience"
             className="select select-bordered"
             value={filters.experience}

@@ -58,7 +58,7 @@ export default function SeekerInfo({
           <h1 className="text-3xl font-bold text-cyan-800">
             Профиль соискателя
           </h1>
-          {mode && (
+          {(mode || !seekerExists) && (
             <button
               className="btn btn-outline btn-sm border-cyan-500 text-cyan-700 hover:bg-cyan-500 hover:text-white"
               onClick={() => setIsModalOpen(true)}
