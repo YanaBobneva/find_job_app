@@ -1,17 +1,25 @@
 "use client";
 
 import { useState } from "react";
+import toast from "react-hot-toast";
 import { api } from "~/trpc/react";
 
 export default function UpdateUser({ user }: { user: any }) {
   const [newEmail, setNewEmail] = useState("");
   const [email, setEmail] = useState(user.email);
-  const updateMutation = api.user.updateEmail.useMutation();
+  const updateMutation = api.user.updateEmail.useMutation({
+    onSuccess: () => {
+      setNewEmail("");
+      setEmail(newEmail);
+      toast.success("Email изменен");
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
   const handleUpdate = (e: React.FormEvent) => {
     e.preventDefault();
     updateMutation.mutate({ newEmail: newEmail });
-    setNewEmail("");
-    setEmail(newEmail);
   };
 
   return (

@@ -45,7 +45,6 @@ export const EditEmployerForm = ({
               value={(formData as any)[name]}
               onChange={onChange}
               className="textarea textarea-bordered w-full"
-              required
             />
           ) : (
             <input
@@ -55,7 +54,11 @@ export const EditEmployerForm = ({
               value={(formData as any)[name]}
               onChange={onChange}
               className="input input-bordered w-full"
-              required
+              required={
+                label === "Название компании" ||
+                label === "Номер телефона" ||
+                label === "Почта"
+              }
             />
           )}
         </div>

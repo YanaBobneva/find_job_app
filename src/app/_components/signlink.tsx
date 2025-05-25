@@ -22,15 +22,9 @@ export default function SigninLink() {
           <div className="flex gap-3">
             <Link
               href="/api/auth/signin"
-              className="rounded-lg px-4 py-2 font-medium text-cyan-700 hover:bg-cyan-100/80"
-            >
-              Войти
-            </Link>
-            <Link
-              href="/api/auth/signin"
               className="rounded-lg bg-cyan-600 px-4 py-2 font-medium text-white hover:bg-cyan-700"
             >
-              Регистрация
+              Войти
             </Link>
           </div>
         </div>
@@ -51,17 +45,6 @@ export default function SigninLink() {
                 Тысячи компаний ищут таких специалистов как ты. Создай профиль,
                 размести резюме и получи предложения от лучших работодателей.
               </p>
-
-              <div className="flex flex-col gap-4 sm:flex-row">
-                <input
-                  type="text"
-                  placeholder="Должность, ключевые навыки..."
-                  className="flex-1 rounded-lg border border-cyan-300 px-4 py-3 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
-                />
-                <button className="rounded-lg bg-cyan-600 px-6 py-3 font-medium text-white transition hover:bg-cyan-700 focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 focus:outline-none">
-                  Найти работу
-                </button>
-              </div>
 
               <div className="mt-8 flex flex-wrap gap-4">
                 {["IT", "Маркетинг", "Дизайн", "Финансы"].map((cat) => (

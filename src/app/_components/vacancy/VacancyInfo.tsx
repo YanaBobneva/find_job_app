@@ -8,6 +8,7 @@ import { api } from "~/trpc/react";
 import { useRouter } from "next/navigation";
 import { useFavoriteVacancy } from "~/hooks/useFavoriteVacancy";
 import { useSendApplication } from "~/hooks/useSendApplication";
+import toast from "react-hot-toast";
 
 export function VacancyInfo({
   vacancy,
@@ -33,8 +34,9 @@ export function VacancyInfo({
     try {
       await deleteMutation.mutateAsync({ jobId: vacancy.id });
       router.push(`/employer/${employerId}`); // редирект после удаления
+      toast.success("Вакансия удалена");
     } catch (error) {
-      console.error("Ошибка при удалении вакансии:", error);
+      toast.error("При удалении вакансии произошла ошибка");
     }
   };
 

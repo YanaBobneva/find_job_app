@@ -4,6 +4,7 @@ import { Fragment, useState } from "react";
 import { experienceLevels } from "~/date/experienceLevels";
 import { api } from "~/trpc/react";
 import { CitySelector } from "../citySelector";
+import toast from "react-hot-toast";
 
 type EditVacancyModalProps = {
   isOpen: boolean;
@@ -42,8 +43,9 @@ export const EditVacancyModal = ({
       await updateMutation.mutateAsync(formData);
       router.refresh();
       onClose(); // Закрыть окно после успешного добавления
+      toast.success("Вакансия обновлена");
     } catch (error) {
-      console.error("Ошибка при изменении вакансии:", error);
+      toast.error("При изменении вакансии произошла ошибка");
     }
   };
 
@@ -99,6 +101,7 @@ export const EditVacancyModal = ({
                       value={formData.title}
                       className="input input-bordered w-full"
                       onChange={handleChange}
+                      required
                     />
                   </div>
 
@@ -120,6 +123,7 @@ export const EditVacancyModal = ({
                       value={formData.salary}
                       className="input input-bordered w-full"
                       onChange={handleChange}
+                      required
                     />
                   </div>
 
@@ -148,6 +152,7 @@ export const EditVacancyModal = ({
                       value={formData.description}
                       className="textarea textarea-bordered w-full"
                       onChange={handleChange}
+                      required
                     />
                   </div>
 
