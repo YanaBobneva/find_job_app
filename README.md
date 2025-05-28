@@ -1,29 +1,68 @@
-# Create T3 App
+# Клиент-серверное приложение для поиска работы на T3 Stack   
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+Платформа для взаимодействия соискателей и работодателей с возможностью поиска вакансий, откликов и управления профилями.
 
-## What's next? How do I make an app with this?
+## ✨ Функционал  
+Приложение разработано с разграничением ролей на работадателей (EMPLOYER) и соискателей (SEEKER)
+### Для соискателей    
+- 🔍 Поиск и фильтрация вакансий  
+- 📨 Отклик на вакансии
+- 💗 Добавление вакансий в избранное 
+- 📂 Личный кабинет с резюме  
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+### Для работодателей  
+- 🏢 Публикация и управление вакансиями  
+- ✉️ Просмотр откликов в почте
+- 🔍 Поиск и фильтрация соискателей 
+- 💗 Добавление соискателей в избранное    
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+## 🚀 Технологии  
+- **Frontend**: Next.js, TypeScript, Tailwind  
+- **Backend**: tRPC, Prisma  
+- **Auth**: NextAuth.js  
+- **DB**: PostgreSQL  
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Drizzle](https://orm.drizzle.team)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
-
-## Learn More
-
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
-
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
-
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
-
-## How do I deploy this?
-
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+## 🛠️ Установка и запуск 
+1. Склонируйте репозиторий
+   ```bash
+   git clone https://github.com/YanaBobneva/find_job_app.git
+   ```
+2. Установите зависимости
+   ```bash
+   pnpm install
+   ```
+3. Создайте ".env" файл в корне проекта и добавьте туда следующий код:
+   ```bash
+   AUTH_SECRET="10ODPIBzZEDdd789POZMVGRF4tmuR0QwKQg3fWgD2fw="
+   EMAIL_SERVER=smtp://127.0.0.1:1026
+   EMAIL_FROM=noreply@example.com
+   DATABASE_URL="postgresql://findjob_user:findjob_pass@127.0.0.1:5433/find_job_app"
+   SMTP_USER=bobneva04@mail.ru
+   SMTP_PASS=mfRDK4W1AxK51r11p7KJ
+   SMTP_HOST=smtp.mail.ru
+   SMTP_PORT=465
+   ```
+4. Откройте docker
+5. Запустите контейнеры
+   ```bash
+   pnpm db:start
+   ```
+6. Чтобы создать БД с актуальной структурой выполните команду
+   ```bash
+   pnpm db:generate
+   ```
+7. Запустите проект
+   ```bash
+   pnpm dev
+   ```
+8. Перейдите по ссылке
+   ```bash
+   http://localhost:3000/
+   ```
+## 🔐 Аутентификация  
+Для аутентификации Используется NextAuth.js с провайдером `EmailProvider`
+### 📧 Вход через Email (Magic Link)
+Для удобства пользователей реализована аутентификация без пароля:
+1. Пользователь вводит email на странице входа
+2. Система отправляет письмо с уникальной ссылкой
+3. При переходе по ссылке происходит автоматический вход
