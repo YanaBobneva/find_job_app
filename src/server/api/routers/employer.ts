@@ -7,6 +7,10 @@ import {
 } from "~/server/api/trpc";
 import { db } from "~/server/db";
 
+export const phoneNumberSchema = z
+  .string()
+  .regex(/^(\+7|8)\d{10}$/, "Неверный формат номера телефона");
+
 export const employerRouter = createTRPCRouter({
   // Мутация для создания нового профиля работодателя
   createEmployer: protectedProcedure
@@ -14,7 +18,7 @@ export const employerRouter = createTRPCRouter({
       z.object({
         companyName: z.string(),
         description: z.string().optional(),
-        phoneNumber: z.string(),
+        phoneNumber: phoneNumberSchema,
         email: z.string().optional(),
         website: z.string().optional(),
       })
@@ -43,7 +47,7 @@ export const employerRouter = createTRPCRouter({
     z.object({
       companyName: z.string(),
       description: z.string().optional(),
-      phoneNumber: z.string(),
+      phoneNumber: phoneNumberSchema,
       email: z.string().optional(),
       website: z.string().optional(),
     })

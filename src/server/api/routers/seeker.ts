@@ -7,9 +7,9 @@ import {
 } from "~/server/api/trpc";
 import { db } from "~/server/db";
 
-// export const phoneNumberSchema = z
-//   .string()
-//   .regex(/^(\+7|8)\d{10}$/, "Неверный формат номера телефона");
+export const phoneNumberSchema = z
+  .string()
+  .regex(/^(\+7|8)\d{10}$/, "Неверный формат номера телефона");
 
 export const seekerRouter = createTRPCRouter({
   // Создание нового профиля соискателя
@@ -21,7 +21,7 @@ export const seekerRouter = createTRPCRouter({
         fathername: z.string(),
         gender: z.string(),
         birthday: z.coerce.date(),
-        phoneNumber: z.string(),
+        phoneNumber: phoneNumberSchema,
         email: z.string().email(),
         education: z.string(),
         resume: z.string(),
@@ -63,7 +63,7 @@ export const seekerRouter = createTRPCRouter({
         fathername: z.string(),
         gender: z.string(),
         birthday: z.coerce.date(),
-        phoneNumber: z.string(),
+        phoneNumber: phoneNumberSchema,
         email: z.string().email(),
         education: z.string(),
         resume: z.string(),
@@ -99,9 +99,8 @@ export const seekerRouter = createTRPCRouter({
   addToFavorites: protectedProcedure
     .input(z.object({ seekerId: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      const employerId = requireRole(ctx, $Enums.Role.EMPLOYER);
-
       try {
+        const employerId = requireRole(ctx, $Enums.Role.EMPLOYER);
         const favorite = await db.favoriteSeeker.create({
           data: {
             employerId,

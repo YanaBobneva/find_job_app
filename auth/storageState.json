@@ -22,10 +22,10 @@
     },
     {
       "name": "authjs.session-token",
-      "value": "ab45ca03-36b7-4b07-b19e-7e60a6415b11",
+      "value": "69106b25-cd59-4740-86d9-1248c4afa9b4",
       "domain": "localhost",
       "path": "/",
-      "expires": 1750585867.459213,
+      "expires": 1751054607.263319,
       "httpOnly": true,
       "secure": false,
       "sameSite": "Lax"

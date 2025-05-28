@@ -14,6 +14,7 @@ interface EditEmployerFormProps {
   onSubmit: (e: React.FormEvent) => void;
   onCancel: () => void;
   isExistingEmployer: boolean;
+  error: string;
 }
 
 export const EditEmployerForm = ({
@@ -22,6 +23,7 @@ export const EditEmployerForm = ({
   onSubmit,
   onCancel,
   isExistingEmployer,
+  error,
 }: EditEmployerFormProps) => (
   <>
     <h2 className="mb-4 text-2xl font-bold text-cyan-800">
@@ -47,19 +49,24 @@ export const EditEmployerForm = ({
               className="textarea textarea-bordered w-full"
             />
           ) : (
-            <input
-              placeholder={label}
-              name={name}
-              type="text"
-              value={(formData as any)[name]}
-              onChange={onChange}
-              className="input input-bordered w-full"
-              required={
-                label === "Название компании" ||
-                label === "Номер телефона" ||
-                label === "Почта"
-              }
-            />
+            <>
+              <input
+                placeholder={label}
+                name={name}
+                type="text"
+                value={(formData as any)[name]}
+                onChange={onChange}
+                className="input input-bordered w-full"
+                required={
+                  label === "Название компании" ||
+                  label === "Номер телефона" ||
+                  label === "Почта"
+                }
+              />
+              {label === "Номер телефона" && error && (
+                <p className="text-red-500">{error}</p>
+              )}
+            </>
           )}
         </div>
       ))}

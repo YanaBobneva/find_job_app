@@ -47,14 +47,34 @@ export const EditSeekerProfileModal = ({
     experienceLevel: seekerInfo.experienceLevel,
     location: seekerInfo.location,
   });
+  const [error, setError] = useState("");
+  const phoneRegex = /^(\+7|8)\d{10}$/;
 
   const genders = [
     { id: "Мужской", name: "Мужской" },
     { id: "Женский", name: "Женский" },
   ];
 
-  const createMutation = api.seeker.createSeeker.useMutation();
-  const updateMutation = api.seeker.updateSeeker.useMutation();
+  const createMutation = api.seeker.createSeeker.useMutation({
+    onError(error) {
+      // Получаем сообщение об ошибке из Zod
+      if (error.data?.zodError?.fieldErrors?.phoneNumber) {
+        setError(error.data.zodError.fieldErrors.phoneNumber[0] ?? "");
+      } else {
+        setError("Произошла ошибка");
+      }
+    },
+  });
+  const updateMutation = api.seeker.updateSeeker.useMutation({
+    onError(error) {
+      // Получаем сообщение об ошибке из Zod
+      if (error.data?.zodError?.fieldErrors?.phoneNumber) {
+        setError(error.data.zodError.fieldErrors.phoneNumber[0] ?? "");
+      } else {
+        setError("Произошла ошибка");
+      }
+    },
+  });
   const router = useRouter();
   const utils = api.useUtils();
 
@@ -109,7 +129,14 @@ export const EditSeekerProfileModal = ({
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >,
   ) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+
+    setFormData({ ...formData, [name]: value });
+
+    // Если редактируется поле phoneNumber, валидируем и убираем ошибку
+    if (name === "phoneNumber" && phoneRegex.test(value)) {
+      setError(""); // сбрасываем ошибку при корректном номере
+    }
   };
 
   return (
@@ -231,6 +258,7 @@ export const EditSeekerProfileModal = ({
                       placeholder="Телефон"
                       required
                     />
+                    {error && <p className="text-red-500">{error}</p>}
                   </div>
                   <div>
                     <label className="text-cyan-700">Email</label>

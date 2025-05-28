@@ -22,17 +22,42 @@ export const useEmployerForm = (
     phoneNumber: initialData.phoneNumber,
     website: initialData.website,
   });
+  const [error, setError] = useState("");
+  const phoneRegex = /^(\+7|8)\d{10}$/;
 
   const router = useRouter();
   const utils = api.useUtils();
-  const createMutation = api.employer.createEmployer.useMutation();
-  const updateMutation = api.employer.updateEmployerInfo.useMutation();
+  const createMutation = api.employer.createEmployer.useMutation({
+    onError(error) {
+      // Получаем сообщение об ошибке из Zod
+      if (error.data?.zodError?.fieldErrors?.phoneNumber) {
+        setError(error.data.zodError.fieldErrors.phoneNumber[0] ?? "");
+      } else {
+        setError("Произошла ошибка");
+      }
+    },
+  });
+  const updateMutation = api.employer.updateEmployerInfo.useMutation({
+    onError(error) {
+      // Получаем сообщение об ошибке из Zod
+      if (error.data?.zodError?.fieldErrors?.phoneNumber) {
+        setError(error.data.zodError.fieldErrors.phoneNumber[0] ?? "");
+      } else {
+        setError("Произошла ошибка");
+      }
+    },
+  });
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+
+    // Если редактируется поле phoneNumber, валидируем и убираем ошибку
+    if (name === "phoneNumber" && phoneRegex.test(value)) {
+      setError(""); // сбрасываем ошибку при корректном номере
+    }
   };
 
   const handleSave = async (e: React.FormEvent) => {
@@ -65,5 +90,5 @@ export const useEmployerForm = (
     }
   };
 
-  return { formData, handleChange, handleSave };
+  return { formData, handleChange, handleSave, error };
 };

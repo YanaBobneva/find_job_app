@@ -1,7 +1,7 @@
 "use client";
 
 import { Dialog, Transition } from "@headlessui/react";
-import { Fragment } from "react";
+import { Fragment, useEffect } from "react";
 import { EditEmployerForm } from "./EditEmployerForm";
 import { useEmployerForm } from "~/hooks/useEmployerForm";
 
@@ -24,7 +24,7 @@ export const EditEmployerInfoModal = ({
   employerInfo,
   isExistingEmployer,
 }: EditEmployerInfoModalProps) => {
-  const { formData, handleChange, handleSave } = useEmployerForm(
+  const { formData, handleChange, handleSave, error } = useEmployerForm(
     employerInfo,
     isExistingEmployer,
     onClose,
@@ -63,6 +63,7 @@ export const EditEmployerInfoModal = ({
                   onSubmit={handleSave}
                   onCancel={onClose}
                   isExistingEmployer={isExistingEmployer}
+                  error={error}
                 />
               </Dialog.Panel>
             </Transition.Child>
